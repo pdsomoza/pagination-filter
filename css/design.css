@@ -48,6 +48,7 @@ body{
     padding: 0 0 20px 0;
     border-bottom: 1px solid #eaeaea;
     display: none;
+    animation: fadein .8s;
   }
 
     .student-details{
@@ -111,3 +112,8 @@ body{
       background-color: #4ba6c3;
       color: #fff;
     }
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
