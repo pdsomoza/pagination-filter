@@ -1,40 +1,67 @@
 (() => {
-  const students = document.querySelectorAll('.student-item');
-  const len = students.length;
-  const page = 10, pages = Math.ceil(len/page);
+  const data = [].slice.call(document.querySelectorAll('.student-item'));
+  let dataFiltered = [];
+  const input = document.getElementById('search');
+  const page = 10; 
   
-  showStudents();
-  paginator();
-  
-  let links = document.querySelectorAll('.pagination a');  
-  links.forEach((link) => {
-    link.addEventListener('click',(e) => {
-      links.forEach((link) => link.classList.remove('active'));      
-      link.classList.add('active');
-      students.forEach((student) => student.style.display = "" )
-      showStudents(link.dataset.page);
-      e.preventDefault();
-    });
-  });
+  search();
+  input.addEventListener("keyup", search);
 
-  function showStudents(to = 1) {
-    let ii = 0;
-    to = page * to;
-    if (to > 10) ii = to - page;
+  function display(arr, numpage) {
+    let len = arr.length;
+    let students = [];
+    let to = page * numpage;
+    let from = (to > 10) ? to - page : 0;
     if (to > len) to = len;
 
-    for(; ii < to; ii++)
-      students[ii].style.display = 'block';
+    for(let ii = from; ii < to; ii++)
+        students.push(arr[ii]);
+    
+    printlist(students);
   }
 
-  function paginator() {
+  function printlist(students) {
+    let html = "";
+    let list = document.querySelector('.student-list');
+    students.forEach((student) => html += student.outerHTML);   
+    list.innerHTML = "";
+    list.innerHTML = html;
+  }
+
+  function pagination(len) {
     let li = "";
+    let pages = Math.ceil(len/page)
     for(let ii = 1; ii <= pages; ii++)
        li += `<li><a href="#" data-page="${ii}">${ii}</a></li>`;
 
     document.querySelector('.pagination').innerHTML = `<ul>${li}</ul>`;
-    document.querySelectorAll('.pagination a')[0].classList.add('active'); 
+    document.querySelectorAll('.pagination a')[0].classList.add('active');
+    bindLinks();
   }
-  
+    
+  function bindLinks(){
+    let links = document.querySelectorAll('.pagination a');  
+    links.forEach((link) => {
+      link.addEventListener('click',(e) => {
+        links.forEach((link) => link.classList.remove('active'));      
+        link.classList.add('active');
+        display(dataFiltered, link.dataset.page);
+        e.preventDefault();
+      });
+    });
+  }
+
+  function search(){
+    let filter = input.value.toUpperCase();
+    
+    dataFiltered = data.filter((student) => {
+      let h3 = student.getElementsByTagName("h3")[0];
+      if (h3.innerHTML.toUpperCase().indexOf(filter) > -1)
+        return student;
+    });
+    
+    display(dataFiltered, 1)
+    pagination(dataFiltered.length);
+   }
 })();
 
